@@ -7,12 +7,6 @@ export default function Header() {
           <a href="/" className="hover:underline">
             Home
           </a>
-          <a href="/dashboard" className="hover:underline">
-            Dashboard
-          </a>
-          <a href="/admin" className="hover:underline">
-            Admin
-          </a>
           <a href="/login" className="hover:underline">
             Login
           </a>
