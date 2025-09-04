@@ -1,4 +1,4 @@
-import { PrismaClient } from "../../generated/prisma";
+import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
@@ -18,12 +18,10 @@ export default async function handler(req, res) {
       const user = await prisma.user.create({
         data: { name, email, password: hashedPassword },
       });
-      res
-        .status(201)
-        .json({
-          message: "Registrasi berhasil.",
-          user: { id: user.id, name: user.name, email: user.email },
-        });
+      res.status(201).json({
+        message: "Registrasi berhasil.",
+        user: { id: user.id, name: user.name, email: user.email },
+      });
     } catch (error) {
       res.status(500).json({ error: "Gagal registrasi." });
     }
