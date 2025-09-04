@@ -30,7 +30,8 @@ export default function Dashboard() {
         <ul>
           {transactions.map((trx) => (
             <li key={trx.id}>
-              {trx.product.name} - Qty: {trx.quantity} - Tanggal: {new Date(trx.createdAt).toLocaleString()}
+              {trx.product.name} - Qty: {trx.quantity} - Tanggal:{" "}
+              {new Date(trx.createdAt).toLocaleString()}
             </li>
           ))}
         </ul>
