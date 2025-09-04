@@ -25,28 +25,43 @@ export default function Login() {
   };
 
   return (
-    <div>
-      <h1>Login Member</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          name="email"
-          type="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-          required
-        />
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={handleChange}
-          required
-        />
-        <button type="submit">Login</button>
-      </form>
-      {message && <p>{message}</p>}
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-8 px-4">
+      <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
+        <h1 className="text-2xl font-bold text-teal-700 mb-6 text-center">
+          Login Member
+        </h1>
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 mb-4">
+          <input
+            name="email"
+            type="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={handleChange}
+            required
+            className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-400"
+          />
+          <input
+            name="password"
+            type="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={handleChange}
+            required
+            className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-400"
+          />
+          <button
+            type="submit"
+            className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded font-bold shadow"
+          >
+            Login
+          </button>
+        </form>
+        {message && (
+          <p className="text-center text-teal-600 font-semibold mt-2">
+            {message}
+          </p>
+        )}
+      </div>
     </div>
   );
 }
