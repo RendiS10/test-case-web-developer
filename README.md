@@ -1,50 +1,98 @@
-## Dokumentasi Fitur Halaman Web
+# 🐾 KucingCare - Web Produk Obat & Vitamin Kucing
 
-### 1. Landing Page Produk
+Website modern berbasis Next.js & Prisma untuk katalog produk, transaksi, dan manajemen member/admin. Menggunakan atomic design untuk struktur komponen yang rapi dan maintainable.
 
-**URL:** [http://localhost:3000/](http://localhost:3000/)
-Menampilkan daftar produk obat dan vitamin kucing (nama, harga, deskripsi singkat).
+---
 
-### 2. Detail Produk
+## 🚀 Fitur Utama
 
-**URL:** [http://localhost:3000/products/[id]](http://localhost:3000/products/[id])
-Menampilkan informasi lengkap produk yang dipilih (nama, harga, deskripsi, gambar).
+- **Landing Page Produk**: Daftar produk obat & vitamin kucing.
+- **Detail Produk**: Info lengkap produk (nama, harga, deskripsi, gambar).
+- **Registrasi & Login Member**: Daftar dan login sebagai member.
+- **Dashboard Member**: Riwayat transaksi, edit profil.
+- **Admin Panel**: CRUD produk, riwayat penjualan, edit profil admin.
+- **Atomic Design**: Komponen UI terstruktur (atoms, molecules, organisms).
 
-### 3. Registrasi Member
+---
 
-**URL:** [http://localhost:3000/register](http://localhost:3000/register)
-Halaman untuk user mendaftar sebagai member baru.
+## 📂 Struktur Folder
 
-### 4. Login Member
+```
+src/
+	components/
+		atoms/        # Komponen dasar (Button, Input, dll)
+		molecules/    # Gabungan atom (FormField, Card, dll)
+		organisms/    # Bagian besar UI (LoginForm, ProductList, Sidebar, dll)
+	pages/          # Halaman utama (index, login, register, dashboard, admin, dll)
+	app/            # Global style & layout
+```
 
-**URL:** [http://localhost:3000/login](http://localhost:3000/login)
-Halaman untuk user melakukan login.
+---
 
-### 5. Dashboard Member
+## 🛠️ Cara Instalasi & Menjalankan Lokal
 
-**URL:** [http://localhost:3000/dashboard](http://localhost:3000/dashboard)
-Setelah login, user dapat melihat riwayat transaksi (dummy data).
+1. Clone repo:
+   ```bash
+   git clone https://github.com/RendiS10/test-case-web-developer.git
+   cd test-case-web-developer
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   # atau
+   yarn install
+   ```
+3. Jalankan server development:
+   ```bash
+   npm run dev
+   # atau
+   yarn dev
+   ```
+4. Buka di browser: [http://localhost:3000](http://localhost:3000)
 
-### 6. Admin Panel (CRUD Produk)
+---
 
-**URL:** [http://localhost:3000/admin](http://localhost:3000/admin)
-Admin dapat menambah, mengedit, dan menghapus produk melalui halaman ini.
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## 👤 Cara Penggunaan
 
-## Getting Started
+- **Member**
+  - Registrasi di `/register`, login di `/login`.
+  - Setelah login, akses dashboard di `/dashboard` untuk melihat riwayat transaksi & edit profil.
+- **Admin**
+  - Login sebagai admin (role: ADMIN), akses panel di `/admin` untuk CRUD produk, riwayat penjualan, dan edit profil admin.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
+## 🌐 Deploy ke Vercel
 
+1. Push semua perubahan ke GitHub.
+2. Buka [Vercel](https://vercel.com), login dengan akun GitHub.
+3. Klik "New Project", pilih repo ini.
+4. Ikuti instruksi, klik "Deploy".
+5. Tambahkan environment variable (misal: `DATABASE_URL`) jika pakai database.
+6. Tunggu proses build & deploy selesai, dapatkan URL aplikasi online.
 
-## Deploy on Vercel
+Referensi: [Next.js Deployment Docs](https://nextjs.org/docs/app/building-your-application/deploying)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📄 Dokumentasi Fitur Halaman
+
+- **Landing Page Produk**: `/` - Daftar produk
+- **Detail Produk**: `/products/[id]` - Info lengkap produk
+- **Registrasi Member**: `/register` - Daftar member baru
+- **Login Member**: `/login` - Login member
+- **Dashboard Member**: `/dashboard` - Riwayat transaksi, edit profil
+- **Admin Panel**: `/admin` - CRUD produk, riwayat penjualan, edit profil admin
+
+---
+
+## 🔗 Teknologi
+
+- [Next.js](https://nextjs.org)
+- [Prisma ORM](https://www.prisma.io/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [SweetAlert2](https://sweetalert2.github.io/)
+
+```
+
 ```
