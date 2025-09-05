@@ -113,6 +113,19 @@ export default function ProductDetailPage() {
                 : "Stok Habis"}
             </button>
           )}
+          {!user && (
+            <div className="mt-4 text-center">
+              <p className="text-red-500 font-semibold mb-2">
+                Silakan login untuk membeli produk ini.
+              </p>
+              <button
+                className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded font-bold shadow"
+                onClick={() => router.push("/login")}
+              >
+                Login untuk Membeli
+              </button>
+            </div>
+          )}
           {data.stock !== undefined && (
             <div className="text-sm text-gray-500 mt-2">
               Stok tersedia: {data.stock}

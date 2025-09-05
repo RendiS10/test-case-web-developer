@@ -38,11 +38,24 @@ export default function Dashboard() {
         if (data.error) setMessage(data.error);
         else setTransactions(data);
       });
-    // Cek menu dari query string hanya di browser
+  }, []);
+
+  useEffect(() => {
     if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get("menu") === "profil") setMenu("profil");
-      else setMenu("riwayat");
+      const handler = () => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get("menu") === "profil") setMenu("profil");
+        else setMenu("riwayat");
+      };
+      handler();
+      window.addEventListener("popstate", handler);
+      window.addEventListener("pushstate", handler);
+      window.addEventListener("replacestate", handler);
+      return () => {
+        window.removeEventListener("popstate", handler);
+        window.removeEventListener("pushstate", handler);
+        window.removeEventListener("replacestate", handler);
+      };
     }
   }, []);
 
@@ -64,7 +77,7 @@ export default function Dashboard() {
       <Header />
       <main className="flex-1 flex items-center justify-center py-8 px-4">
         <div className="flex gap-8 w-full max-w-4xl">
-          <Sidebar active={menu} />
+          <Sidebar active={menu} onMenuChange={setMenu} />
           <div className="flex-1">
             <h1 className="text-2xl font-bold text-teal-700 mb-6 text-center">
               Dashboard Member

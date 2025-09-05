@@ -4,16 +4,23 @@ const prisma = new PrismaClient();
 
 export default async function handler(req, res) {
   if (req.method === "GET") {
-    const { userId } = req.query;
-    if (!userId) {
-      return res.status(400).json({ error: "User ID wajib diisi." });
-    }
+    const { userId, all } = req.query;
     try {
-      // Dummy: ambil transaksi user dari database
-      const transactions = await prisma.transaction.findMany({
-        where: { userId: Number(userId) },
-        include: { product: true },
-      });
+      let transactions = [];
+      if (all === "1") {
+        // Untuk admin: ambil semua transaksi, sertakan relasi user dan product
+        transactions = await prisma.transaction.findMany({
+          include: { user: true, product: true },
+        });
+      } else if (userId) {
+        // Untuk user: ambil transaksi milik user
+        transactions = await prisma.transaction.findMany({
+          where: { userId: Number(userId) },
+          include: { product: true },
+        });
+      } else {
+        return res.status(400).json({ error: "User ID wajib diisi." });
+      }
       res.status(200).json(transactions);
     } catch (error) {
       res.status(500).json({ error: "Gagal mengambil riwayat transaksi." });

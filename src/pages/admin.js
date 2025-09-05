@@ -38,23 +38,45 @@ export default function AdminPanel() {
       fetchTransactions();
     } else if (params.get("menu") === "profil") {
       setMenu("profil");
-      const userObj = JSON.parse(userData);
-      setProfile({
-        name: userObj.name,
-        email: userObj.email,
-        bio: userObj.bio || "",
-        address: userObj.address || "",
-        avatar: userObj.avatar || "",
-      });
     } else {
       setMenu("produk");
     }
   }, []);
 
+  // Fetch data admin setiap kali menu berubah ke profil
+  useEffect(() => {
+    if (menu === "profil") {
+      const userData = localStorage.getItem("user");
+      if (!userData) return;
+      const userObj = JSON.parse(userData);
+      fetch(`/api/admin/profile?id=${userObj.id}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.user) {
+            setProfile({
+              name: data.user.name,
+              email: data.user.email,
+              bio: data.user.bio || "",
+              address: data.user.address || "",
+              avatar: data.user.avatar || "",
+            });
+          } else {
+            setProfile({
+              name: userObj.name,
+              email: userObj.email,
+              bio: userObj.bio || "",
+              address: userObj.address || "",
+              avatar: userObj.avatar || "",
+            });
+          }
+        });
+    }
+  }, [menu]);
+
   const fetchTransactions = async () => {
     const res = await fetch("/api/transactions?all=1");
     const data = await res.json();
-    setTransactions(data);
+    setTransactions(Array.isArray(data) ? data : []);
   };
 
   const fetchProducts = async () => {
@@ -151,7 +173,13 @@ export default function AdminPanel() {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 flex flex-col items-center">
       <div className="flex gap-8 w-full max-w-5xl">
-        <AdminSidebar active={menu} />
+        <AdminSidebar
+          active={menu}
+          onMenuChange={(m) => {
+            setMenu(m);
+            if (m === "riwayat") fetchTransactions();
+          }}
+        />
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-teal-700 mb-6 text-center">
             Dashboard Admin
@@ -168,51 +196,50 @@ export default function AdminPanel() {
                 >
                   <input
                     name="name"
-                    placeholder="Nama"
                     value={form.name}
                     onChange={handleChange}
-                    required
+                    placeholder="Nama Produk"
                     className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-400"
+                    required
                   />
                   <input
                     name="price"
-                    type="number"
-                    placeholder="Harga"
                     value={form.price}
                     onChange={handleChange}
-                    required
+                    placeholder="Harga Produk"
+                    type="number"
                     className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-400"
+                    required
                   />
                   <input
                     name="description"
-                    placeholder="Deskripsi"
                     value={form.description}
                     onChange={handleChange}
-                    required
+                    placeholder="Deskripsi Produk"
                     className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-400"
                   />
                   <input
                     name="image"
-                    placeholder="URL Gambar (opsional)"
                     value={form.image}
                     onChange={handleChange}
+                    placeholder="URL Gambar"
                     className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-400"
                   />
                   <input
                     name="stock"
-                    type="number"
-                    placeholder="Stok Produk"
                     value={form.stock}
                     onChange={handleChange}
-                    required
+                    placeholder="Stok"
+                    type="number"
                     className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-400"
+                    required
                   />
-                  <div className="flex gap-2">
+                  <div className="flex gap-4 mt-2">
                     <button
                       type="submit"
                       className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded font-bold shadow"
                     >
-                      {editId ? "Edit Produk" : "Tambah Produk"}
+                      {editId ? "Simpan Edit" : "Simpan Produk"}
                     </button>
                     {editId && (
                       <button
@@ -229,7 +256,7 @@ export default function AdminPanel() {
                           });
                         }}
                       >
-                        Batal Edit
+                        Batal
                       </button>
                     )}
                   </div>
@@ -299,37 +326,51 @@ export default function AdminPanel() {
               </div>
             </>
           )}
+
           {menu === "riwayat" && (
             <div className="bg-white rounded-2xl shadow-lg p-8">
               <h2 className="text-xl font-bold text-teal-700 mb-4 text-center">
                 Riwayat Penjualan
               </h2>
-              {transactions.length === 0 ? (
+              {!Array.isArray(transactions) || transactions.length === 0 ? (
                 <p className="text-gray-500 text-center">
-                  Belum ada transaksi.
+                  Belum ada transaksi atau data tidak valid.
                 </p>
               ) : (
-                <ul className="space-y-4">
-                  {transactions.map((trx) => (
-                    <li
-                      key={trx.id}
-                      className="border rounded-xl p-4 flex flex-col sm:flex-row sm:items-center gap-4"
-                    >
-                      <div className="flex-1">
-                        <div className="font-bold text-teal-800">
-                          {trx.product.name}
-                        </div>
-                        <div className="text-gray-700">Qty: {trx.quantity}</div>
-                        <div className="text-gray-600">
-                          Tanggal: {new Date(trx.createdAt).toLocaleString()}
-                        </div>
-                        <div className="text-gray-500">
-                          Pembeli: {trx.user.name} ({trx.user.email})
-                        </div>
+                <div className="space-y-8">
+                  {Object.entries(
+                    transactions.reduce((acc, trx) => {
+                      const userId = trx.user.id;
+                      if (!acc[userId])
+                        acc[userId] = { user: trx.user, list: [] };
+                      acc[userId].list.push(trx);
+                      return acc;
+                    }, {})
+                  ).map(([userId, { user, list }]) => (
+                    <div key={userId} className="border rounded-2xl p-4">
+                      <div className="font-bold text-teal-700 mb-2">
+                        {user.name}{" "}
+                        <span className="text-gray-500">({user.email})</span>
                       </div>
-                    </li>
+                      <ul className="space-y-2">
+                        {list.map((trx) => (
+                          <li key={trx.id} className="border rounded-xl p-3">
+                            <div className="font-semibold text-teal-800">
+                              {trx.product.name}
+                            </div>
+                            <div className="text-gray-700">
+                              Qty: {trx.quantity}
+                            </div>
+                            <div className="text-gray-600">
+                              Tanggal:{" "}
+                              {new Date(trx.createdAt).toLocaleString()}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   ))}
-                </ul>
+                </div>
               )}
             </div>
           )}
@@ -340,22 +381,37 @@ export default function AdminPanel() {
               </h2>
               <form
                 className="grid grid-cols-1 gap-4 max-w-md mx-auto bg-gray-50 p-6 rounded-xl shadow"
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
-                  // TODO: update profile API
-                  localStorage.setItem(
-                    "user",
-                    JSON.stringify({
-                      ...JSON.parse(localStorage.getItem("user")),
-                      ...profile,
-                    })
-                  );
-                  Swal.fire({
-                    icon: "success",
-                    title: "Profil admin berhasil diupdate!",
-                    timer: 1500,
-                    showConfirmButton: false,
+                  const userData = JSON.parse(localStorage.getItem("user"));
+                  const res = await fetch("/api/admin/profile", {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      id: userData.id,
+                      name: profile.name,
+                      email: profile.email,
+                      bio: profile.bio,
+                      address: profile.address,
+                      avatar: profile.avatar,
+                    }),
                   });
+                  const data = await res.json();
+                  if (data.error) {
+                    Swal.fire({
+                      icon: "error",
+                      title: "Gagal update profil admin",
+                      text: data.error,
+                    });
+                  } else {
+                    localStorage.setItem("user", JSON.stringify(data.user));
+                    Swal.fire({
+                      icon: "success",
+                      title: "Profil admin berhasil diupdate!",
+                      timer: 1500,
+                      showConfirmButton: false,
+                    });
+                  }
                 }}
               >
                 <input
@@ -372,10 +428,8 @@ export default function AdminPanel() {
                   type="email"
                   placeholder="Email"
                   value={profile.email}
-                  onChange={(e) =>
-                    setProfile({ ...profile, email: e.target.value })
-                  }
-                  className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-400"
+                  readOnly
+                  className="border rounded px-3 py-2 bg-gray-100 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-teal-400"
                 />
                 <input
                   name="bio"
