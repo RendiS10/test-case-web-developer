@@ -92,19 +92,52 @@ export default function Dashboard() {
                 onChange={(e) =>
                   setProfile({ ...profile, [e.target.name]: e.target.value })
                 }
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
-                  // TODO: update profile API
-                  localStorage.setItem(
-                    "user",
-                    JSON.stringify({ ...user, ...profile })
-                  );
-                  Swal.fire({
-                    icon: "success",
-                    title: "Profil berhasil diupdate!",
-                    timer: 1500,
-                    showConfirmButton: false,
-                  });
+                  if (!user) return;
+                  try {
+                    const res = await fetch("/api/admin/profile", {
+                      method: "PUT",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        id: user.id,
+                        name: profile.name,
+                        email: profile.email,
+                        bio: profile.bio,
+                        address: profile.address,
+                        avatar: profile.avatar,
+                      }),
+                    });
+                    const data = await res.json();
+                    if (data.user) {
+                      localStorage.setItem("user", JSON.stringify(data.user));
+                      setProfile({
+                        name: data.user.name,
+                        email: data.user.email,
+                        bio: data.user.bio || "",
+                        address: data.user.address || "",
+                        avatar: data.user.avatar || "",
+                      });
+                      Swal.fire({
+                        icon: "success",
+                        title: "Profil berhasil diupdate!",
+                        timer: 1500,
+                        showConfirmButton: false,
+                      });
+                    } else {
+                      Swal.fire({
+                        icon: "error",
+                        title: "Gagal update profil",
+                        text: data.error || "Terjadi kesalahan.",
+                      });
+                    }
+                  } catch (err) {
+                    Swal.fire({
+                      icon: "error",
+                      title: "Gagal update profil",
+                      text: err.message,
+                    });
+                  }
                 }}
               />
             )}
