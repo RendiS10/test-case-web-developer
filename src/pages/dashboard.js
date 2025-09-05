@@ -38,11 +38,13 @@ export default function Dashboard() {
         if (data.error) setMessage(data.error);
         else setTransactions(data);
       });
-    // Cek menu dari query string
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("menu") === "profil") setMenu("profil");
-    else setMenu("riwayat");
-  }, [window.location.search]);
+    // Cek menu dari query string hanya di browser
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("menu") === "profil") setMenu("profil");
+      else setMenu("riwayat");
+    }
+  }, []);
 
   if (message)
     return (

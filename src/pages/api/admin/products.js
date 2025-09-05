@@ -29,7 +29,10 @@ export default async function handler(req, res) {
       });
       res.status(201).json(product);
     } catch (error) {
-      res.status(500).json({ error: "Gagal menambah produk." });
+      console.error("CREATE PRODUCT ERROR:", error);
+      res
+        .status(500)
+        .json({ error: error.message || "Gagal menambah produk." });
     }
   } else if (req.method === "PUT") {
     // Edit produk
@@ -62,7 +65,22 @@ export default async function handler(req, res) {
       await prisma.product.delete({ where: { id: Number(id) } });
       res.status(200).json({ message: "Produk berhasil dihapus." });
     } catch (error) {
-      res.status(500).json({ error: "Gagal menghapus produk." });
+      console.error("DELETE PRODUCT ERROR:", error);
+      if (error.code === "P2025") {
+        res.status(404).json({ error: "Produk tidak ditemukan." });
+      } else if (
+        error.code === "ER_ROW_IS_REFERENCED_2" ||
+        (error.message && error.message.includes("foreign key constraint"))
+      ) {
+        res.status(400).json({
+          error:
+            "Produk tidak bisa dihapus karena masih ada riwayat pembelian.",
+        });
+      } else {
+        res
+          .status(500)
+          .json({ error: error.message || "Gagal menghapus produk." });
+      }
     }
   } else {
     res.status(405).json({ error: "Metode tidak diizinkan." });

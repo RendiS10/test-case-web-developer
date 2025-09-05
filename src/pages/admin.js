@@ -77,14 +77,27 @@ export default function AdminPanel() {
       body: JSON.stringify(editId ? { ...form, id: editId } : form),
     });
     const data = await res.json();
-    setMessage(
-      data.message ||
-        data.error ||
-        (editId ? "Produk berhasil diedit." : "Produk berhasil ditambah.")
-    );
-    setForm({ name: "", price: "", description: "", image: "", stock: "" });
-    setEditId(null);
-    fetchProducts();
+    if (data.error) {
+      Swal.fire({
+        icon: "error",
+        title: "Gagal menyimpan produk",
+        text: data.error,
+      });
+      setMessage(data.error);
+    } else {
+      Swal.fire({
+        icon: "success",
+        title: editId ? "Produk berhasil diedit." : "Produk berhasil ditambah.",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+      setMessage(
+        editId ? "Produk berhasil diedit." : "Produk berhasil ditambah."
+      );
+      setForm({ name: "", price: "", description: "", image: "", stock: "" });
+      setEditId(null);
+      fetchProducts();
+    }
   };
 
   const handleEdit = (product) => {
@@ -99,14 +112,40 @@ export default function AdminPanel() {
   };
 
   const handleDelete = async (id) => {
-    const res = await fetch("/api/admin/products", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
+    Swal.fire({
+      title: "Yakin ingin menghapus produk?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Ya, hapus",
+      cancelButtonText: "Batal",
+      reverseButtons: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const res = await fetch("/api/admin/products", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id }),
+        });
+        const data = await res.json();
+        if (data.error) {
+          Swal.fire({
+            icon: "error",
+            title: "Gagal menghapus produk",
+            text: data.error,
+          });
+          setMessage(data.error);
+        } else {
+          Swal.fire({
+            icon: "success",
+            title: "Produk berhasil dihapus.",
+            timer: 1500,
+            showConfirmButton: false,
+          });
+          setMessage("Produk berhasil dihapus.");
+          fetchProducts();
+        }
+      }
     });
-    const data = await res.json();
-    setMessage(data.message || data.error || "Produk berhasil dihapus.");
-    fetchProducts();
   };
 
   return (
@@ -206,50 +245,56 @@ export default function AdminPanel() {
                   Daftar Produk
                 </h2>
                 <ul className="space-y-6">
-                  {products.map((product) => (
-                    <li
-                      key={product.id}
-                      className="border rounded-xl p-4 flex flex-col sm:flex-row sm:items-center gap-4"
-                    >
-                      <div className="flex-1">
-                        <div className="font-bold text-lg text-teal-800">
-                          {product.name}
+                  {Array.isArray(products) &&
+                    products.map((product) => (
+                      <li
+                        key={product.id}
+                        className="border rounded-xl p-4 flex flex-col sm:flex-row sm:items-center gap-4"
+                      >
+                        <div className="flex-1">
+                          <div className="font-bold text-lg text-teal-800">
+                            {product.name}
+                          </div>
+                          <div className="text-teal-600 font-bold">
+                            Rp{product.price}
+                          </div>
+                          <div className="text-gray-600 mb-2">
+                            {product.description}
+                          </div>
+                          <div className="text-gray-500 mb-2">
+                            Stok: {product.stock}
+                          </div>
+                          <div className="flex gap-2 mt-2">
+                            <button
+                              className="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded font-bold shadow"
+                              onClick={() => handleEdit(product)}
+                            >
+                              Edit
+                            </button>
+                            <button
+                              className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded font-bold shadow"
+                              onClick={() => handleDelete(product.id)}
+                            >
+                              Hapus
+                            </button>
+                          </div>
                         </div>
-                        <div className="text-teal-600 font-bold">
-                          Rp{product.price}
-                        </div>
-                        <div className="text-gray-600 mb-2">
-                          {product.description}
-                        </div>
-                        <div className="text-gray-500 mb-2">
-                          Stok: {product.stock}
-                        </div>
-                        <div className="flex gap-2 mt-2">
-                          <button
-                            className="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded font-bold shadow"
-                            onClick={() => handleEdit(product)}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded font-bold shadow"
-                            onClick={() => handleDelete(product.id)}
-                          >
-                            Hapus
-                          </button>
-                        </div>
-                      </div>
-                      {product.image && (
-                        <div className="flex-shrink-0">
-                          <img
-                            src={product.image}
-                            alt={product.name}
-                            className="w-24 h-24 object-cover rounded shadow"
-                          />
-                        </div>
-                      )}
+                        {product.image && (
+                          <div className="flex-shrink-0">
+                            <img
+                              src={product.image}
+                              alt={product.name}
+                              className="w-24 h-24 object-cover rounded shadow"
+                            />
+                          </div>
+                        )}
+                      </li>
+                    ))}
+                  {!Array.isArray(products) && (
+                    <li className="text-red-500">
+                      {products.error || "Gagal memuat produk."}
                     </li>
-                  ))}
+                  )}
                 </ul>
               </div>
             </>
