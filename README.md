@@ -62,19 +62,6 @@ src/
 
 ---
 
-## 🌐 Deploy ke Vercel
-
-1. Push semua perubahan ke GitHub.
-2. Buka [Vercel](https://vercel.com), login dengan akun GitHub.
-3. Klik "New Project", pilih repo ini.
-4. Ikuti instruksi, klik "Deploy".
-5. Tambahkan environment variable (misal: `DATABASE_URL`) jika pakai database.
-6. Tunggu proses build & deploy selesai, dapatkan URL aplikasi online.
-
-Referensi: [Next.js Deployment Docs](https://nextjs.org/docs/app/building-your-application/deploying)
-
----
-
 ## 📄 Dokumentasi Fitur Halaman
 
 - **Landing Page Produk**: `/` - Daftar produk
