@@ -1,4 +1,6 @@
 import { useEffect, useState, useRef } from "react";
+import Swal from "sweetalert2";
+import Link from "next/link";
 
 export default function Header() {
   const [user, setUser] = useState(null);
@@ -20,8 +22,27 @@ export default function Header() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    window.location.href = "/";
+    Swal.fire({
+      title: "Yakin ingin logout?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Ya, logout",
+      cancelButtonText: "Batal",
+      reverseButtons: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        localStorage.removeItem("user");
+        Swal.fire({
+          icon: "success",
+          title: "Logout Berhasil",
+          text: "Anda telah keluar dari akun.",
+          timer: 1200,
+          showConfirmButton: false,
+        }).then(() => {
+          window.location.href = "/";
+        });
+      }
+    });
   };
 
   return (
@@ -29,17 +50,17 @@ export default function Header() {
       <div className="container mx-auto flex justify-between items-center px-4">
         <h1 className="text-2xl font-bold">Toko Obat & Vitamin Kucing</h1>
         <nav className="space-x-4 flex items-center">
-          <a href="/" className="hover:underline">
+          <Link href="/" className="hover:underline">
             Home
-          </a>
+          </Link>
           {!user && (
             <>
-              <a href="/login" className="hover:underline">
+              <Link href="/login" className="hover:underline">
                 Login
-              </a>
-              <a href="/register" className="hover:underline">
+              </Link>
+              <Link href="/register" className="hover:underline">
                 Register
-              </a>
+              </Link>
             </>
           )}
           {user && (
@@ -58,21 +79,21 @@ export default function Header() {
               {dropdown && (
                 <div className="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded shadow z-10">
                   {user.role === "ADMIN" ? (
-                    <a
+                    <Link
                       href="/admin"
                       className="block px-4 py-2 hover:bg-gray-100"
                       onClick={() => setDropdown(false)}
                     >
                       Dashboard Admin
-                    </a>
+                    </Link>
                   ) : (
-                    <a
+                    <Link
                       href="/dashboard"
                       className="block px-4 py-2 hover:bg-gray-100"
                       onClick={() => setDropdown(false)}
                     >
                       Dashboard
-                    </a>
+                    </Link>
                   )}
                   <button
                     className="block w-full text-left px-4 py-2 hover:bg-gray-100"

@@ -13,13 +13,19 @@ export default async function handler(req, res) {
     }
   } else if (req.method === "POST") {
     // Tambah produk baru
-    const { name, price, description, image } = req.body;
+    const { name, price, description, image, stock } = req.body;
     if (!name || !price || !description) {
       return res.status(400).json({ error: "Semua field wajib diisi." });
     }
     try {
       const product = await prisma.product.create({
-        data: { name, price: Number(price), description, image },
+        data: {
+          name,
+          price: Number(price),
+          description,
+          image,
+          stock: Number(stock),
+        },
       });
       res.status(201).json(product);
     } catch (error) {
@@ -27,14 +33,20 @@ export default async function handler(req, res) {
     }
   } else if (req.method === "PUT") {
     // Edit produk
-    const { id, name, price, description, image } = req.body;
+    const { id, name, price, description, image, stock } = req.body;
     if (!id || !name || !price || !description) {
       return res.status(400).json({ error: "Semua field wajib diisi." });
     }
     try {
       const product = await prisma.product.update({
         where: { id: Number(id) },
-        data: { name, price: Number(price), description, image },
+        data: {
+          name,
+          price: Number(price),
+          description,
+          image,
+          stock: Number(stock),
+        },
       });
       res.status(200).json(product);
     } catch (error) {

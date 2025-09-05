@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 import AdminSidebar from "../components/AdminSidebar";
 
 export default function AdminPanel() {
@@ -81,7 +82,7 @@ export default function AdminPanel() {
         data.error ||
         (editId ? "Produk berhasil diedit." : "Produk berhasil ditambah.")
     );
-    setForm({ name: "", price: "", description: "", image: "" });
+    setForm({ name: "", price: "", description: "", image: "", stock: "" });
     setEditId(null);
     fetchProducts();
   };
@@ -304,7 +305,12 @@ export default function AdminPanel() {
                       ...profile,
                     })
                   );
-                  alert("Profil admin berhasil diupdate!");
+                  Swal.fire({
+                    icon: "success",
+                    title: "Profil admin berhasil diupdate!",
+                    timer: 1500,
+                    showConfirmButton: false,
+                  });
                 }}
               >
                 <input

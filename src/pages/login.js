@@ -1,10 +1,13 @@
 import { useState } from "react";
+import Swal from "sweetalert2";
+import { useRouter } from "next/router";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [message, setMessage] = useState("");
+  const router = useRouter();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -23,6 +26,19 @@ export default function Login() {
     // Simpan data user ke localStorage/session jika login berhasil
     if (data.user) {
       localStorage.setItem("user", JSON.stringify(data.user));
+      Swal.fire({
+        icon: "success",
+        title: "Login Berhasil",
+        text: "Selamat datang, " + data.user.name + "!",
+        timer: 1500,
+        showConfirmButton: false,
+      }).then(() => {
+        if (data.user.role === "ADMIN") {
+          router.push("/admin");
+        } else {
+          router.push("/dashboard");
+        }
+      });
     }
   };
 
@@ -80,3 +96,4 @@ export default function Login() {
     </div>
   );
 }
+// ...existing code...

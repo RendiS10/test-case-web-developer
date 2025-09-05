@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Sidebar from "../components/Sidebar";
@@ -41,7 +42,7 @@ export default function Dashboard() {
     const params = new URLSearchParams(window.location.search);
     if (params.get("menu") === "profil") setMenu("profil");
     else setMenu("riwayat");
-  }, []);
+  }, [window.location.search]);
 
   if (message)
     return (
@@ -112,7 +113,12 @@ export default function Dashboard() {
                       "user",
                       JSON.stringify({ ...user, ...profile })
                     );
-                    alert("Profil berhasil diupdate!");
+                    Swal.fire({
+                      icon: "success",
+                      title: "Profil berhasil diupdate!",
+                      timer: 1500,
+                      showConfirmButton: false,
+                    });
                   }}
                 >
                   <input

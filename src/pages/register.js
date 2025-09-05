@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Swal from "sweetalert2";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
@@ -12,14 +13,42 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage("");
-    const res = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+    Swal.fire({
+      title: "Data sudah benar?",
+      text: "Pastikan data yang diisi sudah benar sebelum registrasi.",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Ya, Registrasi",
+      cancelButtonText: "Cek Lagi",
+      reverseButtons: true,
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        setMessage("");
+        const res = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        });
+        const data = await res.json();
+        if (data.user || data.message) {
+          Swal.fire({
+            icon: "success",
+            title: "Registrasi Berhasil",
+            text: "Akun berhasil dibuat. Silakan login.",
+            timer: 1500,
+            showConfirmButton: false,
+          }).then(() => {
+            window.location.href = "/login";
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Registrasi Gagal",
+            text: data.error || "Terjadi kesalahan.",
+          });
+        }
+      }
     });
-    const data = await res.json();
-    setMessage(data.message || data.error);
   };
 
   return (
