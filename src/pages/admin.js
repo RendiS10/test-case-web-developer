@@ -1,6 +1,12 @@
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import AdminSidebar from "../components/AdminSidebar";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import AdminSidebarNav from "../components/organisms/AdminSidebarNav";
+import ProductForm from "../components/organisms/ProductForm";
+import ProductList from "../components/organisms/ProductList";
+import TransactionHistory from "../components/organisms/TransactionHistory";
+import ProfileForm from "../components/organisms/ProfileForm";
 
 export default function AdminPanel() {
   const [products, setProducts] = useState([]);
@@ -171,216 +177,56 @@ export default function AdminPanel() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 flex flex-col items-center">
-      <div className="flex gap-8 w-full max-w-5xl">
-        <AdminSidebar
-          active={menu}
-          onMenuChange={(m) => {
-            setMenu(m);
-            if (m === "riwayat") fetchTransactions();
-          }}
-        />
-        <div className="flex-1">
-          <h1 className="text-2xl font-bold text-teal-700 mb-6 text-center">
-            Dashboard Admin
-          </h1>
-          {menu === "produk" && (
-            <>
-              <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-                <h2 className="text-xl font-bold text-teal-700 mb-4 text-center">
-                  CRUD Produk
-                </h2>
-                <form
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <Header />
+      <main className="flex-1 flex items-center justify-center py-8 px-4">
+        <div className="flex gap-8 w-full max-w-5xl">
+          <AdminSidebarNav
+            active={menu}
+            onMenuChange={(m) => {
+              setMenu(m);
+              if (m === "riwayat") fetchTransactions();
+            }}
+          />
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold text-teal-700 mb-6 text-center">
+              Dashboard Admin
+            </h1>
+            {menu === "produk" && (
+              <>
+                <ProductForm
+                  form={form}
+                  onChange={handleChange}
                   onSubmit={handleSubmit}
-                  className="grid grid-cols-1 gap-4 mb-4"
-                >
-                  <input
-                    name="name"
-                    value={form.name}
-                    onChange={handleChange}
-                    placeholder="Nama Produk"
-                    className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-400"
-                    required
-                  />
-                  <input
-                    name="price"
-                    value={form.price}
-                    onChange={handleChange}
-                    placeholder="Harga Produk"
-                    type="number"
-                    className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-400"
-                    required
-                  />
-                  <input
-                    name="description"
-                    value={form.description}
-                    onChange={handleChange}
-                    placeholder="Deskripsi Produk"
-                    className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-400"
-                  />
-                  <input
-                    name="image"
-                    value={form.image}
-                    onChange={handleChange}
-                    placeholder="URL Gambar"
-                    className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-400"
-                  />
-                  <input
-                    name="stock"
-                    value={form.stock}
-                    onChange={handleChange}
-                    placeholder="Stok"
-                    type="number"
-                    className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-400"
-                    required
-                  />
-                  <div className="flex gap-4 mt-2">
-                    <button
-                      type="submit"
-                      className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded font-bold shadow"
-                    >
-                      {editId ? "Simpan Edit" : "Simpan Produk"}
-                    </button>
-                    {editId && (
-                      <button
-                        type="button"
-                        className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded font-bold shadow"
-                        onClick={() => {
-                          setEditId(null);
-                          setForm({
-                            name: "",
-                            price: "",
-                            description: "",
-                            image: "",
-                            stock: "",
-                          });
-                        }}
-                      >
-                        Batal
-                      </button>
-                    )}
-                  </div>
-                </form>
-                {message && (
-                  <p className="text-center text-teal-600 font-semibold mb-4">
-                    {message}
-                  </p>
-                )}
-              </div>
-              <div className="bg-white rounded-2xl shadow-lg p-8">
-                <h2 className="text-xl font-bold text-teal-700 mb-4 text-center">
-                  Daftar Produk
-                </h2>
-                <ul className="space-y-6">
-                  {Array.isArray(products) &&
-                    products.map((product) => (
-                      <li
-                        key={product.id}
-                        className="border rounded-xl p-4 flex flex-col sm:flex-row sm:items-center gap-4"
-                      >
-                        <div className="flex-1">
-                          <div className="font-bold text-lg text-teal-800">
-                            {product.name}
-                          </div>
-                          <div className="text-teal-600 font-bold">
-                            Rp{product.price}
-                          </div>
-                          <div className="text-gray-600 mb-2">
-                            {product.description}
-                          </div>
-                          <div className="text-gray-500 mb-2">
-                            Stok: {product.stock}
-                          </div>
-                          <div className="flex gap-2 mt-2">
-                            <button
-                              className="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded font-bold shadow"
-                              onClick={() => handleEdit(product)}
-                            >
-                              Edit
-                            </button>
-                            <button
-                              className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded font-bold shadow"
-                              onClick={() => handleDelete(product.id)}
-                            >
-                              Hapus
-                            </button>
-                          </div>
-                        </div>
-                        {product.image && (
-                          <div className="flex-shrink-0">
-                            <img
-                              src={product.image}
-                              alt={product.name}
-                              className="w-24 h-24 object-cover rounded shadow"
-                            />
-                          </div>
-                        )}
-                      </li>
-                    ))}
-                  {!Array.isArray(products) && (
-                    <li className="text-red-500">
-                      {products.error || "Gagal memuat produk."}
-                    </li>
-                  )}
-                </ul>
-              </div>
-            </>
-          )}
-
-          {menu === "riwayat" && (
-            <div className="bg-white rounded-2xl shadow-lg p-8">
-              <h2 className="text-xl font-bold text-teal-700 mb-4 text-center">
-                Riwayat Penjualan
-              </h2>
-              {!Array.isArray(transactions) || transactions.length === 0 ? (
-                <p className="text-gray-500 text-center">
-                  Belum ada transaksi atau data tidak valid.
-                </p>
-              ) : (
-                <div className="space-y-8">
-                  {Object.entries(
-                    transactions.reduce((acc, trx) => {
-                      const userId = trx.user.id;
-                      if (!acc[userId])
-                        acc[userId] = { user: trx.user, list: [] };
-                      acc[userId].list.push(trx);
-                      return acc;
-                    }, {})
-                  ).map(([userId, { user, list }]) => (
-                    <div key={userId} className="border rounded-2xl p-4">
-                      <div className="font-bold text-teal-700 mb-2">
-                        {user.name}{" "}
-                        <span className="text-gray-500">({user.email})</span>
-                      </div>
-                      <ul className="space-y-2">
-                        {list.map((trx) => (
-                          <li key={trx.id} className="border rounded-xl p-3">
-                            <div className="font-semibold text-teal-800">
-                              {trx.product.name}
-                            </div>
-                            <div className="text-gray-700">
-                              Qty: {trx.quantity}
-                            </div>
-                            <div className="text-gray-600">
-                              Tanggal:{" "}
-                              {new Date(trx.createdAt).toLocaleString()}
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-          {menu === "profil" && (
-            <div className="bg-white rounded-2xl shadow-lg p-8">
-              <h2 className="text-xl font-bold text-teal-700 mb-4 text-center">
-                Edit Profil Admin
-              </h2>
-              <form
-                className="grid grid-cols-1 gap-4 max-w-md mx-auto bg-gray-50 p-6 rounded-xl shadow"
+                  editId={editId}
+                  onCancel={() => {
+                    setEditId(null);
+                    setForm({
+                      name: "",
+                      price: "",
+                      description: "",
+                      image: "",
+                      stock: "",
+                    });
+                  }}
+                  message={message}
+                />
+                <ProductList
+                  products={products}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                />
+              </>
+            )}
+            {menu === "riwayat" && (
+              <TransactionHistory transactions={transactions} />
+            )}
+            {menu === "profil" && (
+              <ProfileForm
+                profile={profile}
+                onChange={(e) =>
+                  setProfile({ ...profile, [e.target.name]: e.target.value })
+                }
                 onSubmit={async (e) => {
                   e.preventDefault();
                   const userData = JSON.parse(localStorage.getItem("user"));
@@ -413,62 +259,13 @@ export default function AdminPanel() {
                     });
                   }
                 }}
-              >
-                <input
-                  name="name"
-                  placeholder="Nama"
-                  value={profile.name}
-                  onChange={(e) =>
-                    setProfile({ ...profile, name: e.target.value })
-                  }
-                  className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-400"
-                />
-                <input
-                  name="email"
-                  type="email"
-                  placeholder="Email"
-                  value={profile.email}
-                  readOnly
-                  className="border rounded px-3 py-2 bg-gray-100 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-teal-400"
-                />
-                <input
-                  name="bio"
-                  placeholder="Bio"
-                  value={profile.bio}
-                  onChange={(e) =>
-                    setProfile({ ...profile, bio: e.target.value })
-                  }
-                  className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-400"
-                />
-                <input
-                  name="address"
-                  placeholder="Alamat"
-                  value={profile.address}
-                  onChange={(e) =>
-                    setProfile({ ...profile, address: e.target.value })
-                  }
-                  className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-400"
-                />
-                <input
-                  name="avatar"
-                  placeholder="URL Avatar"
-                  value={profile.avatar}
-                  onChange={(e) =>
-                    setProfile({ ...profile, avatar: e.target.value })
-                  }
-                  className="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-400"
-                />
-                <button
-                  type="submit"
-                  className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded font-bold shadow"
-                >
-                  Simpan Perubahan
-                </button>
-              </form>
-            </div>
-          )}
+                disabledEmail={true}
+              />
+            )}
+          </div>
         </div>
-      </div>
+      </main>
+      <Footer />
     </div>
   );
 }
