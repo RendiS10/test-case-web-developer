@@ -9,7 +9,7 @@ export default function HeaderNav({
   handleLogout,
 }) {
   return (
-    <nav className="space-x-4 flex items-center">
+    <nav className="space-x-4 flex items-center gap-4">
       <Link href="/" className="hover:underline">
         Home
       </Link>
